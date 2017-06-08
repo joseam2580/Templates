@@ -26,6 +26,17 @@
         "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
     },
+     "location": {
+       "type": "string",
+       "defaultValue": "West US",
+        "allowedValues": [
+          "West US",
+          "East US 2"
+          ],
+          "metadata": {
+        "description":"Restricts choice to where premiun storage is locate in the US."
+  }
+  },
     "windowsOSVersion": {
       "type": "string",
       "defaultValue": "2012-R2-Datacenter",
@@ -37,10 +48,14 @@
       "metadata": {
         "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version. Allowed values: 2008-R2-SP1, 2012-Datacenter, 2012-R2-Datacenter."
       }
+    },
+     "sizeOfEachDataDisckInGB": {
+        "metadata": {
+        "description":"Size of each data disck in GB."
+      }
     }
   },
   "variables": {
-    "location": "West US",
     "imagePublisher": "MicrosoftWindowsServer",
     "imageOffer": "WindowsServer",
     "OSDiskName": "osdiskforwindowssimple",
@@ -56,7 +71,9 @@
     "vmSize": "Standard_A2",
     "virtualNetworkName": "MyVNET",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+    "dataDisk1VhdName":
+    "[contact('http://',parameters('newSotageAcountName'),'.blob.core.windows.net/',variables9'vmStorageAcountContainerName'),'/',variables('vmName'),'dataDisk1.vhd')]"
   },
   "resources": [
     {
@@ -161,6 +178,18 @@
             "createOption": "FromImage"
           }
         },
+        "dataDisks":[
+          {
+            "name": "datadisk1",
+            "diskSizaGB": "[parameters('sizeOfDiskInGB')]",
+            "lun": 0,
+            "vhd": {
+              "uri": "[variables('dataDisk1VhdName')]"
+            },
+            "createOption": "Empty"
+          }
+          ]
+      },
         "networkProfile": {
           "networkInterfaces": [
             {
@@ -175,7 +204,7 @@
           }
         }
       }
-    }
+    
   ]
 }
 
